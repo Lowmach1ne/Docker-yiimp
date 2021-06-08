@@ -11,6 +11,9 @@ RUN dnf upgrade -y
 # install git
 RUN dnf install git -y
 
+# install dev tools
+RUN dnf group install "Development Tools" -y
+
 # Download yiimp
 RUN git clone --progress ${REPOSITORY} ~/yiimp
 RUN make -C ~/yiimp/stratum/iniparser
@@ -43,6 +46,9 @@ RUN dnf install php-fpm
 
 # install mysql
 RUN dnf install mariadb -y
+
+# uninstall dev tools
+RUN dnf group remove "Development Tools" -y
 
 WORKDIR /var/stratum
 
