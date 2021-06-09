@@ -7,6 +7,7 @@ ENV container docker
 
 # Add repo
 RUN dnf install epel-release -y
+RUN dnf install dnf-plugins-core -y
 RUN dnf config-manager --set-enabled powertools
 
 # updates os
