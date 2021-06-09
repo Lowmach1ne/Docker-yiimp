@@ -13,6 +13,7 @@ RUN dnf install git -y
 
 # install dev tools
 RUN dnf group install "Development Tools" -y
+RUN dnf install gmp gmp-devel
 
 # Download yiimp
 RUN git clone --progress ${REPOSITORY} ~/yiimp
