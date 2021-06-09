@@ -15,17 +15,6 @@ RUN dnf install git -y
 RUN dnf group install "Development Tools" -y
 RUN dnf install gmp gmp-devel -y
 
-# Download yiimp
-RUN git clone --progress ${REPOSITORY} ~/yiimp
-RUN make -C ~/yiimp/stratum/iniparser
-RUN make -C ~/yiimp/stratum
-RUN mkdir -p /var/stratum/config
-RUN cp ~/yiimp/stratum/run.sh /var/stratum
-RUN cp ~/yiimp/stratum/config/run.sh /var/stratum/config
-RUN cp ~/yiimp/stratum/stratum /var/stratum
-RUN cp ~/yiimp/stratum/config.sample/neo.conf /var/stratum/config
-#RUN rm -rf ~/yiimp
-
 # crontab
 RUN dnf install -y cronie
 #RUN (crontab -l 2>/dev/null; echo "* * * * * /usr/bin/verify-external-ip.sh") | crontab -
@@ -47,6 +36,17 @@ RUN dnf install php-fpm -y
 
 # install mysql
 RUN dnf install mariadb -y
+
+# Download yiimp
+RUN git clone --progress ${REPOSITORY} ~/yiimp
+RUN make -C ~/yiimp/stratum/iniparser
+RUN make -C ~/yiimp/stratum
+RUN mkdir -p /var/stratum/config
+RUN cp ~/yiimp/stratum/run.sh /var/stratum
+RUN cp ~/yiimp/stratum/config/run.sh /var/stratum/config
+RUN cp ~/yiimp/stratum/stratum /var/stratum
+RUN cp ~/yiimp/stratum/config.sample/neo.conf /var/stratum/config
+#RUN rm -rf ~/yiimp
 
 # uninstall dev tools
 RUN dnf group remove "Development Tools" -y
