@@ -5,8 +5,9 @@ ARG REPOSITORY=https://github.com/tpruvot/yiimp.git
 # Enabled systemd
 ENV container docker
 
-# Add epel repo
+# Add repo
 RUN dnf install epel-release -y
+RUN dnf config-manager --set-enabled powertools
 
 # updates os
 RUN dnf upgrade -y
@@ -17,6 +18,14 @@ RUN dnf install git -y
 # install dev tools
 RUN dnf group install "Development Tools" -y
 RUN dnf install gmp gmp-devel -y
+RUN dnf install mariadb-devel -y
+RUN dnf install libcurl-devel -y
+RUN dnf install libidn2-devel -y
+RUN dnf install libssh-devel -y
+RUN dnf install brotli-devel -y
+RUN dnf install openldap-devel -y
+RUN dnf install libnghttp2-devel -y
+RUN dnf install libpsl-devel -y
 
 # crontab
 RUN dnf install -y cronie
