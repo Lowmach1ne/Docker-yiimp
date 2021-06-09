@@ -5,6 +5,9 @@ ARG REPOSITORY=https://github.com/tpruvot/yiimp.git
 # Enabled systemd
 ENV container docker
 
+# Add epel repo
+RUN dnf install epel-release -y
+
 # updates os
 RUN dnf upgrade -y
 
