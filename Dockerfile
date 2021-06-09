@@ -13,7 +13,7 @@ RUN dnf install git -y
 
 # install dev tools
 RUN dnf group install "Development Tools" -y
-RUN dnf install gmp gmp-devel
+RUN dnf install gmp gmp-devel -y
 
 # Download yiimp
 RUN git clone --progress ${REPOSITORY} ~/yiimp
@@ -42,7 +42,7 @@ RUN dnf install -y memcached
 #RUN systemctl enable memcached
 
 # install php
-RUN dnf install php-fpm
+RUN dnf install php-fpm -y
 #RUN systemctl enable php-fpm
 
 # install mysql
