@@ -7,6 +7,7 @@ ENV container docker
 
 # Add repo
 RUN dnf install epel-release -y
+RUN dnf install https://rpms.remirepo.net/enterprise/remi-release-8.rpm -y
 RUN dnf install dnf-plugins-core -y
 RUN dnf config-manager --set-enabled powertools
 
@@ -44,7 +45,11 @@ RUN dnf install -y memcached
 #RUN systemctl enable memcached
 
 # install php
-RUN dnf install php-fpm -y
+RUN dnf module reset php -y
+RUN dnf module install php:remi-8.0 -y
+RUN dnf install php-fpm php-opcache php php-common php-gd php-mysql php-imap php-cli \
+    php-cgi php-pear ImageMagick php-curl php-intl php-pspell php-mcrypt\
+    php-sqlite3 php-tidy php-xmlrpc php-xsl php-memcache php-imagick php-gettext php-zip php-mbstring -y
 #RUN systemctl enable php-fpm
 
 # install mysql
