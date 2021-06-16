@@ -44,6 +44,12 @@ RUN dnf install -y nginx
 RUN dnf install -y memcached
 #RUN systemctl enable memcached
 
+# install lib ruby
+RUN dnf install ruby-libs -y
+
+# install libmcrypt
+RUN dnf install libmcrypt -y
+
 # install php
 RUN dnf module reset php -y
 RUN dnf module install php:remi-8.0 -y
