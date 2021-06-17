@@ -66,27 +66,25 @@ RUN dnf install mariadb -y
 RUN blckntifypass=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1`
 
 # Download yiimp
-RUN git clone --progress ${REPOSITORY} ~/yiimp
+RUN git clone --progress ${REPOSITORY} /root/yiimp
 
 # Compile blocknotify
 WORKDIR /root/yiimp/blocknotify
-RUN ls # debug
-RUN pwd # debug
 RUN sed -i 's/tu8tu5/'$blckntifypass'/' blocknotify.cpp
-RUN make
-
-# Compile stratum
-WORKDIR /root/yiimp/stratum
-RUN sed -i 's/CFLAGS += -DNO_EXCHANGE/#CFLAGS += -DNO_EXCHANGE/' ~/yiimp/stratum/Makefile # enable BTC
 RUN make
 
 # Compile iniparser
 WORKDIR /root/yiimp/stratum/iniparser
 RUN make
 
+# Compile stratum
+WORKDIR /root/yiimp/stratum
+RUN sed -i 's/CFLAGS += -DNO_EXCHANGE/#CFLAGS += -DNO_EXCHANGE/' /root/yiimp/stratum/Makefile # enable BTC
+RUN make
+
 # Copy Files (Blocknotify,iniparser,Stratum)
 WORKDIR /root/yiimp
-RUN sed -i 's/AdminRights/'AdminPanel'/' ~/yiimp/web/yaamp/modules/site/SiteController.php
+RUN sed -i 's/AdminRights/'AdminPanel'/' /root/yiimp/web/yaamp/modules/site/SiteController.php
 RUN cp -r ~/yiimp/web /var/
 RUN mkdir -p /var/stratum
 WORKDIR /root/yiimp/stratum
@@ -94,11 +92,11 @@ RUN cp -a config.sample/. /var/stratum/config
 RUN cp -r stratum /var/stratum
 RUN cp -r run.sh /var/stratum
 WORKDIR /root/yiimp
-RUN cp -r ~/yiimp/bin/. /bin/
-RUN cp -r ~/yiimp/blocknotify/blocknotify /usr/bin/
-RUN cp -r ~/yiimp/blocknotify/blocknotify /var/stratum/
+RUN cp -r /root/yiimp/bin/. /bin/
+RUN cp -r /root/yiimp/blocknotify/blocknotify /usr/bin/
+RUN cp -r /root/yiimp/blocknotify/blocknotify /var/stratum/
 RUN mkdir -p /etc/yiimp
-RUN mkdir -p ~/backup/
+RUN mkdir -p /root/backup/
 
 # fixing yiimp
 RUN sed -i "s|ROOTDIR=/data/yiimp|ROOTDIR=/var|g" /bin/yiimp
