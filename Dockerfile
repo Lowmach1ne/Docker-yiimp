@@ -113,7 +113,7 @@ RUN echo -e '\
     sleep 2 \n\
     done \n\
     exec bash \n\
-    ' | sudo -E tee /var/stratum/config/run.sh >/dev/null 2>&1
+    ' | tee /var/stratum/config/run.sh >/dev/null 2>&1
 RUN chmod +x /var/stratum/config/run.sh
 
 # Set timezone
@@ -202,7 +202,7 @@ RUN echo -e 'include /etc/nginx/blockuseragents.rules; \n\
             include snippets/fastcgi-php.conf; \n\
         } \n\
       } \n\
-    } \n\ ' | sudo -E tee /etc/nginx/sites-available/$server_name.conf >/dev/null 2>&1
+    } \n\ ' | tee /etc/nginx/sites-available/$server_name.conf >/dev/null 2>&1
 RUN ln -s /etc/nginx/sites-available/$server_name.conf /etc/nginx/sites-enabled/$server_name.conf
 RUN ln -s /var/web /var/www/$server_name/html
 
