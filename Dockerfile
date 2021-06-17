@@ -116,7 +116,7 @@ exec bash \n\
 RUN chmod +x /var/stratum/config/run.sh
 
 # Set timezone
-RUN timedatectl set-timezone America/Toronto
+RUN ln -sf /usr/share/zoneinfo/America/Toronto /etc/localtime
 
 # uninstall dev tools
 RUN dnf group remove "Development Tools" -y
