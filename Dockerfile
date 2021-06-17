@@ -1,5 +1,6 @@
 FROM amd64/almalinux:latest
 MAINTAINER Lowmach1ne
+ENV server_name=yiimp.test.com
 ARG REPOSITORY=https://github.com/tpruvot/yiimp.git
 
 # Enabled systemd
@@ -115,8 +116,96 @@ RUN echo '
     ' | sudo -E tee /var/stratum/config/run.sh >/dev/null 2>&1
 RUN chmod +x /var/stratum/config/run.sh
 
+# Set timezone
+RUN timedatectl set-timezone America/Toronto
+
 # uninstall dev tools
 RUN dnf group remove "Development Tools" -y
+
+# install fail2ban
+RUN dnf install fail2ban -y
+
+# Web setup
+RUN mkdir -p /var/www/$server_name/html
+RUN echo 'include /etc/nginx/blockuseragents.rules;
+    server {
+    if ($blockedagent) {
+                return 403;
+        }
+        if ($request_method !~ ^(GET|HEAD|POST)$) {
+        return 444;
+        }
+        listen 80;
+        listen [::]:80;
+        server_name '"${server_name}"';
+        root "/var/www/'"${server_name}"'/html/web";
+        index index.html index.htm index.php;
+        charset utf-8;
+
+        location / {
+        try_files $uri $uri/ /index.php?$args;
+        }
+        location @rewrite {
+        rewrite ^/(.*)$ /index.php?r=$1;
+        }
+
+        location = /favicon.ico { access_log off; log_not_found off; }
+        location = /robots.txt  { access_log off; log_not_found off; }
+
+        access_log /var/log/nginx/'"${server_name}"'.app-access.log;
+        error_log /var/log/nginx/'"${server_name}"'.app-error.log;
+
+        # allow larger file uploads and longer script runtimes
+    client_body_buffer_size  50k;
+        client_header_buffer_size 50k;
+        client_max_body_size 50k;
+        large_client_header_buffers 2 50k;
+        sendfile off;
+
+        location ~ ^/index\.php$ {
+            fastcgi_split_path_info ^(.+\.php)(/.+)$;
+            fastcgi_pass unix:/var/run/php/php7.3-fpm.sock;
+            fastcgi_index index.php;
+            include fastcgi_params;
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+            fastcgi_intercept_errors off;
+            fastcgi_buffer_size 16k;
+            fastcgi_buffers 4 16k;
+            fastcgi_connect_timeout 300;
+            fastcgi_send_timeout 300;
+            fastcgi_read_timeout 300;
+        try_files $uri $uri/ =404;
+        }
+        location ~ \.php$ {
+            return 404;
+        }
+        location ~ \.sh {
+        return 404;
+        }
+        location ~ /\.ht {
+        deny all;
+        }
+        location ~ /.well-known {
+        allow all;
+        }
+        location /phpmyadmin {
+        root /usr/share/;
+        index index.php;
+        try_files $uri $uri/ =404;
+        location ~ ^/phpmyadmin/(doc|sql|setup)/ {
+            deny all;
+      }
+        location ~ /phpmyadmin/(.+\.php)$ {
+            fastcgi_pass unix:/run/php/php7.3-fpm.sock;
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+            include fastcgi_params;
+            include snippets/fastcgi-php.conf;
+        }
+      }
+    }
+    ' | sudo -E tee /etc/nginx/sites-available/$server_name.conf >/dev/null 2>&1
+RUN ln -s /etc/nginx/sites-available/$server_name.conf /etc/nginx/sites-enabled/$server_name.conf
+RUN ln -s /var/web /var/www/$server_name/html
 
 WORKDIR /var/stratum
 
