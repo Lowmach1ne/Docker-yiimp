@@ -103,15 +103,15 @@ RUN sed -i "s|ROOTDIR=/data/yiimp|ROOTDIR=/var|g" /bin/yiimp
 
 # fixing run.sh
 RUN rm -r /var/stratum/config/run.sh
-RUN echo '
-    #!/bin/bash
-    ulimit -n 10240
-    ulimit -u 10240
-    cd /var/stratum
-    while true; do
-    ./stratum /var/stratum/config/$1
-    sleep 2
-    done
+RUN echo -e '\
+    #!/bin/bash \n\
+    ulimit -n 10240 \n\
+    ulimit -u 10240 \n\
+    cd /var/stratum \n\
+    while true; do \n\
+    ./stratum /var/stratum/config/$1 \n\
+    sleep 2 \n\
+    done \n\
     exec bash
     ' | sudo -E tee /var/stratum/config/run.sh >/dev/null 2>&1
 RUN chmod +x /var/stratum/config/run.sh
@@ -127,83 +127,82 @@ RUN dnf install fail2ban -y
 
 # Web setup
 RUN mkdir -p /var/www/$server_name/html
-RUN echo 'include /etc/nginx/blockuseragents.rules;
-    server {
-    if ($blockedagent) {
-                return 403;
-        }
-        if ($request_method !~ ^(GET|HEAD|POST)$) {
-        return 444;
-        }
-        listen 80;
-        listen [::]:80;
-        server_name '"${server_name}"';
-        root "/var/www/'"${server_name}"'/html/web";
-        index index.html index.htm index.php;
-        charset utf-8;
-
-        location / {
-        try_files $uri $uri/ /index.php?$args;
-        }
-        location @rewrite {
-        rewrite ^/(.*)$ /index.php?r=$1;
-        }
-
-        location = /favicon.ico { access_log off; log_not_found off; }
-        location = /robots.txt  { access_log off; log_not_found off; }
-
-        access_log /var/log/nginx/'"${server_name}"'.app-access.log;
-        error_log /var/log/nginx/'"${server_name}"'.app-error.log;
-
-        # allow larger file uploads and longer script runtimes
-    client_body_buffer_size  50k;
-        client_header_buffer_size 50k;
-        client_max_body_size 50k;
-        large_client_header_buffers 2 50k;
-        sendfile off;
-
-        location ~ ^/index\.php$ {
-            fastcgi_split_path_info ^(.+\.php)(/.+)$;
-            fastcgi_pass unix:/var/run/php/php7.3-fpm.sock;
-            fastcgi_index index.php;
-            include fastcgi_params;
-            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-            fastcgi_intercept_errors off;
-            fastcgi_buffer_size 16k;
-            fastcgi_buffers 4 16k;
-            fastcgi_connect_timeout 300;
-            fastcgi_send_timeout 300;
-            fastcgi_read_timeout 300;
-        try_files $uri $uri/ =404;
-        }
-        location ~ \.php$ {
-            return 404;
-        }
-        location ~ \.sh {
-        return 404;
-        }
-        location ~ /\.ht {
-        deny all;
-        }
-        location ~ /.well-known {
-        allow all;
-        }
-        location /phpmyadmin {
-        root /usr/share/;
-        index index.php;
-        try_files $uri $uri/ =404;
-        location ~ ^/phpmyadmin/(doc|sql|setup)/ {
-            deny all;
-      }
-        location ~ /phpmyadmin/(.+\.php)$ {
-            fastcgi_pass unix:/run/php/php7.3-fpm.sock;
-            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-            include fastcgi_params;
-            include snippets/fastcgi-php.conf;
-        }
-      }
-    }
-    ' | sudo -E tee /etc/nginx/sites-available/$server_name.conf >/dev/null 2>&1
+RUN echo -e 'include /etc/nginx/blockuseragents.rules; \n\
+    server { \n\
+    if ($blockedagent) { \n\
+                return 403; \n\
+        } \n\
+        if ($request_method !~ ^(GET|HEAD|POST)$) { \n\
+        return 444; \n\
+        } \n\
+        listen 80; \n\
+        listen [::]:80; \n\
+        server_name '"${server_name}"'; \n\
+        root "/var/www/'"${server_name}"'/html/web"; \n\
+        index index.html index.htm index.php; \n\
+        charset utf-8; \n\
+    \n\
+        location / { \n\
+        try_files $uri $uri/ /index.php?$args; \n\
+        } \n\
+        location @rewrite { \n\
+        rewrite ^/(.*)$ /index.php?r=$1; \n\
+        } \n\
+    \n\
+        location = /favicon.ico { access_log off; log_not_found off; } \n\
+        location = /robots.txt  { access_log off; log_not_found off; } \n\
+    \n\
+        access_log /var/log/nginx/'"${server_name}"'.app-access.log; \n\
+        error_log /var/log/nginx/'"${server_name}"'.app-error.log; \n\
+    \n\
+        # allow larger file uploads and longer script runtimes \n\
+        client_body_buffer_size  50k; \n\
+        client_header_buffer_size 50k; \n\
+        client_max_body_size 50k; \n\
+        large_client_header_buffers 2 50k; \n\
+        sendfile off; \n\
+    \n\
+        location ~ ^/index\.php$ { \n\
+            fastcgi_split_path_info ^(.+\.php)(/.+)$; \n\
+            fastcgi_pass unix:/var/run/php/php7.3-fpm.sock; \n\
+            fastcgi_index index.php; \n\
+            include fastcgi_params; \n\
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name; \n\
+            fastcgi_intercept_errors off; \n\
+            fastcgi_buffer_size 16k; \n\
+            fastcgi_buffers 4 16k; \n\
+            fastcgi_connect_timeout 300; \n\
+            fastcgi_send_timeout 300; \n\
+            fastcgi_read_timeout 300; \n\
+        try_files $uri $uri/ =404; \n\
+        } \n\
+        location ~ \.php$ { \n\
+            return 404; \n\
+        } \n\
+        location ~ \.sh { \n\
+        return 404; \n\
+        } \n\
+        location ~ /\.ht { \n\
+        deny all; \n\
+        } \n\
+        location ~ /.well-known { \n\
+        allow all; \n\
+        } \n\
+        location /phpmyadmin { \n\
+        root /usr/share/; \n\
+        index index.php; \n\
+        try_files $uri $uri/ =404; \n\
+        location ~ ^/phpmyadmin/(doc|sql|setup)/ { \n\
+            deny all; \n\
+      } \n\
+        location ~ /phpmyadmin/(.+\.php)$ { \n\
+            fastcgi_pass unix:/run/php/php-fpm.sock; \n\
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name; \n\
+            include fastcgi_params; \n\
+            include snippets/fastcgi-php.conf; \n\
+        } \n\
+      } \n\
+    } \n\ ' | sudo -E tee /etc/nginx/sites-available/$server_name.conf >/dev/null 2>&1
 RUN ln -s /etc/nginx/sites-available/$server_name.conf /etc/nginx/sites-enabled/$server_name.conf
 RUN ln -s /var/web /var/www/$server_name/html
 
