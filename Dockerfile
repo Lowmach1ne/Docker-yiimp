@@ -69,29 +69,29 @@ RUN blckntifypass=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 
 RUN git clone --progress ${REPOSITORY} ~/yiimp
 
 # Compile blocknotify
-RUN cd ~/yiimp/blocknotify
+WORKDIR ~/yiimp/blocknotify
 RUN sed -i 's/tu8tu5/'$blckntifypass'/' blocknotify.cpp
 RUN make
 
 # Compile stratum
-RUN cd ~/yiimp/stratum
+WORKDIR ~/yiimp/stratum
 RUN sed -i 's/CFLAGS += -DNO_EXCHANGE/#CFLAGS += -DNO_EXCHANGE/' ~/yiimp/stratum/Makefile # enable BTC
 RUN make
 
 # Compile iniparser
-RUN cd ~/yiimp/stratum/iniparser
+WORKDIR ~/yiimp/stratum/iniparser
 RUN make
 
 # Copy Files (Blocknotify,iniparser,Stratum)
-RUN cd ~/yiimp
+WORKDIR ~/yiimp
 RUN sed -i 's/AdminRights/'AdminPanel'/' ~/yiimp/web/yaamp/modules/site/SiteController.php
 RUN cp -r ~/yiimp/web /var/
 RUN mkdir -p /var/stratum
-RUN cd ~/yiimp/stratum
+WORKDIR cd ~/yiimp/stratum
 RUN cp -a config.sample/. /var/stratum/config
 RUN cp -r stratum /var/stratum
 RUN cp -r run.sh /var/stratum
-RUN cd ~/yiimp
+WORKDIR cd ~/yiimp
 RUN cp -r ~/yiimp/bin/. /bin/
 RUN cp -r ~/yiimp/blocknotify/blocknotify /usr/bin/
 RUN cp -r ~/yiimp/blocknotify/blocknotify /var/stratum/
