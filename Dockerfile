@@ -70,6 +70,8 @@ RUN git clone --progress ${REPOSITORY} ~/yiimp
 
 # Compile blocknotify
 WORKDIR ~/yiimp/blocknotify
+RUN ls # debug
+RUN pwd # debug
 RUN sed -i 's/tu8tu5/'$blckntifypass'/' blocknotify.cpp
 RUN make
 
