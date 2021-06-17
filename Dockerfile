@@ -112,7 +112,7 @@ RUN echo -e '\
     ./stratum /var/stratum/config/$1 \n\
     sleep 2 \n\
     done \n\
-    exec bash
+    exec bash \n\
     ' | sudo -E tee /var/stratum/config/run.sh >/dev/null 2>&1
 RUN chmod +x /var/stratum/config/run.sh
 
