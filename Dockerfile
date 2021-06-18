@@ -1,6 +1,6 @@
 FROM amd64/almalinux:latest
 MAINTAINER Lowmach1ne
-ENV server_name=yiimp.test.com
+ARG server_name=yiimp.test.com
 ARG REPOSITORY=https://github.com/tpruvot/yiimp.git
 
 # Enabled systemd
@@ -125,7 +125,7 @@ RUN dnf group remove "Development Tools" -y
 RUN dnf install fail2ban -y
 
 # Web setup
-RUN mkdir -p /var/www/$server_name/html
+RUN mkdir -p /var/www/${server_name}/html
 RUN echo -e 'include /etc/nginx/blockuseragents.rules; \n\
 server { \n\
 if ($blockedagent) { \n\
@@ -163,7 +163,7 @@ if ($blockedagent) { \n\
 \n\
     location ~ ^/index\.php$ { \n\
         fastcgi_split_path_info ^(.+\.php)(/.+)$; \n\
-        fastcgi_pass unix:/var/run/php/php7.3-fpm.sock; \n\
+        fastcgi_pass unix:/var/run/php/php-fpm.sock; \n\
         fastcgi_index index.php; \n\
         include fastcgi_params; \n\
         fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name; \n\
@@ -201,9 +201,9 @@ if ($blockedagent) { \n\
         include snippets/fastcgi-php.conf; \n\
     } \n\
   } \n\
-} \n\ ' | tee /etc/nginx/sites-available/$server_name.conf >/dev/null 2>&1
-RUN ln -s /etc/nginx/sites-available/$server_name.conf /etc/nginx/sites-enabled/$server_name.conf
-RUN ln -s /var/web /var/www/$server_name/html
+} \n\ ' | tee /etc/nginx/sites-available/${server_name}.conf >/dev/null 2>&1
+RUN ln -s /etc/nginx/sites-available/${server_name}.conf /etc/nginx/sites-enabled/${server_name}.conf
+RUN ln -s /var/web /var/www/${server_name}/html
 
 WORKDIR /var/stratum
 
