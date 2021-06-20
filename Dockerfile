@@ -115,6 +115,20 @@ exec bash \n\
 ' | tee /var/stratum/config/run.sh >/dev/null 2>&1
 RUN chmod +x /var/stratum/config/run.sh
 
+# deploy screen-scrypt
+RUN echo -e '#!/bin/bash\n\
+LOG_DIR=/var/log/yiimp\n\
+WEB_DIR=/var/web\n\
+STRATUM_DIR=/var/stratum\n\
+USR_BIN=/usr/bin\n\
+\n\
+screen -dmS main bash $WEB_DIR/main.sh\n\
+screen -dmS loop2 bash $WEB_DIR/loop2.sh\n\
+screen -dmS blocks bash $WEB_DIR/blocks.sh\n\
+screen -dmS debug tail -f $LOG_DIR/debug.log\n\
+' | tee /etc/screen-scrypt.sh >/dev/null 2>&1
+RUN chmod +x /etc/screen-scrypt.sh
+
 # Set timezone
 RUN ln -sf /usr/share/zoneinfo/America/Toronto /etc/localtime
 
@@ -127,6 +141,8 @@ RUN dnf install fail2ban -y
 WORKDIR /var/stratum
 
 # End
-CMD ["bash", "run.sh", "neo.conf"]
+ENTRYPOINT ["/usr/sbin/init"]
+CMD ["systemctl"]
+#CMD ["bash", "run.sh", "neo.conf"]
 
 #EXPOSE 4233
