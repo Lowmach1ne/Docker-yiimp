@@ -15,6 +15,9 @@ RUN dnf config-manager --set-enabled powertools
 # updates os
 RUN dnf upgrade -y
 
+# Replace systemctl
+COPY systemctl.py /usr/bin/systemctl
+
 # install git
 RUN dnf install git -y
 
@@ -32,18 +35,18 @@ RUN dnf install libpsl-devel -y
 
 # crontab
 RUN dnf install -y cronie
-#RUN (crontab -l 2>/dev/null; echo "* * * * * /usr/bin/verify-external-ip.sh") | crontab -
+RUN (crontab -l 2>/dev/null; echo "* * * * * /usr/bin/verify-external-ip.sh") | crontab -
 
 # install screen
 RUN dnf install screen -y
 
 # install nginx
 RUN dnf install -y nginx
-#RUN systemctl enable nginx
+RUN systemctl enable nginx
 
 # install memcached
 RUN dnf install -y memcached
-#RUN systemctl enable memcached
+RUN systemctl enable memcached
 
 # install lib ruby
 RUN dnf install ruby-libs -y
@@ -57,7 +60,7 @@ RUN dnf module install php:remi-8.0 -y
 RUN dnf install php-fpm php-opcache php php-common php-gd php-mysql php-imap php-cli \
     php-cgi php-pear ImageMagick php-curl php-intl php-pspell php-mcrypt\
     php-sqlite3 php-tidy php-xmlrpc php-xsl php-memcache php-imagick php-gettext php-zip php-mbstring -y
-#RUN systemctl enable php-fpm
+RUN systemctl enable php-fpm
 
 # install mysql
 RUN dnf install mariadb -y
@@ -142,7 +145,6 @@ WORKDIR /var/stratum
 
 # End
 ENTRYPOINT ["/usr/sbin/init"]
-CMD ["systemctl"]
 #CMD ["bash", "run.sh", "neo.conf"]
 
 #EXPOSE 4233
